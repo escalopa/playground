@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <title>User Management</title>
+  <style>
+    body {
+      padding: 20px;
+    }
+
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Create User</h5>
+        <form id="userForm">
+          <div class="form-group">
+            <input type="text" class="form-control" id="userName" placeholder="Enter user name" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Create User</button>
+        </form>
+      </div>
+    </div>
+
+    <h5>All Users:</h5>
+    <ul id="userList" class="list-group"></ul>
+  </div>
+
+  <script>
+    const userForm = document.getElementById('userForm');
+    const userNameInput = document.getElementById('userName');
+    const userList = document.getElementById('userList');
+
+    userForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = userNameInput.value;
+
+      const response = await fetch('/user/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name }),
+      });
+
+      if (response.ok) {
+        userNameInput.value = ''; // Clear input field
+        loadUsers(); // Refresh user list
+      } else {
+        console.error('Failed to create user');
+      }
+    });
+
+    async function loadUsers () {
+      const response = await fetch('/user/');
+      const users = await response.json();
+      userList.innerHTML = '';
+      users.forEach(user => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.textContent = user.name;
+        userList.appendChild(li);
+      });
+    }
+
+    // Load users on initial page load
+    loadUsers();
+  </script>
+</body>
+
+</html>
